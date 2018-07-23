@@ -1,0 +1,587 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Template>
+    <Model>
+        <Head>
+            using System;
+            using System.Collections.Generic;
+            using System.Data;
+
+            namespace {0}.Support.Model
+            @
+                //生成时间:{4}
+                /// &lt;summary>
+                /// 实体类 {1}
+                /// &lt;/summary>
+                public class {2}
+                @
+                    public {2}()@$
+
+                    #region Model
+                    {3}
+                    #endregion Model
+                $
+            $
+        </Head>
+        <Var>
+                    private {0} _{1};
+        </Var>
+        <SetGet>
+                    /// &lt;summary>
+                    /// {0}
+                    /// &lt;/summary>
+                    public {1} {2}
+                    @
+                        set @ _{2} = value; $
+                        get @ return _{2}; $
+                    $
+        </SetGet>
+    </Model>
+    <Collection>
+        <Head>
+            using System;
+            using System.Collections;
+
+            namespace {0}.Support.Model
+            @
+                //生成时间:{3}
+                /// &lt;summary>
+                /// {1} {2}实体集合
+                /// &lt;/summary>
+                public class {1}Collection:IEnumerable,IEnumerator
+                @
+                    private {1}[] _collection;
+                    public {1}Collection({1}[] collection)
+                    @
+                        _collection = new {1}[collection.Length];
+                        for (int i = 0; i &lt; collection.Length; i++)
+                        @
+                            _collection[i] = collection[i];
+                        $
+                    $
+
+                    //IEnumerable 实现部分
+                    public IEnumerator GetEnumerator()
+                    @
+                        return (IEnumerator)this;
+                    $
+
+                    //IEnumerator 实现部分
+                    private int position = -1;
+                    public bool MoveNext()
+                    @
+                        position++;
+                        return (position &lt; _collection.Length);
+                    $
+
+                    public void Reset()
+                    @
+                        position = -1;
+                    $
+
+                    public object Current
+                    @
+                        get
+                        @
+                            try
+                            @
+                                return _collection[position];
+                            $
+                            catch (IndexOutOfRangeException)
+                            @
+                                throw new InvalidOperationException();
+                            $
+                        $
+                    $
+                $
+            $
+        </Head>
+    </Collection>
+
+    <Query.xml>
+            &lt;?xml version="1.0" encoding="utf-8"?>
+            &lt;!--数据库 SQL 命令集-->
+            &lt;SQL>
+                &lt;!--查询操作语句-->
+                &lt;SELECT>
+                    &lt;!--通用查询语句-->
+                    &lt;UniversalSelect>SELECT @0$ FROM @1$ WHERE @2$&lt;/UniversalSelect>
+                    {0}
+                &lt;/SELECT>
+            
+                &lt;!--更新操作语句-->
+                &lt;UPDATE>
+                    {1}
+                &lt;/UPDATE>
+            
+                &lt;!--插入操作语句-->
+                &lt;INSERT>
+                    {2}
+                &lt;/INSERT>
+            
+                &lt;!--删除操作语句-->
+                &lt;DELETE>
+                    &lt;!--通用删除语句-->
+                    &lt;UniversalDelete>DELETE FROM @0$ WHERE @1$&lt;/UniversalDelete>
+                    {3}
+                &lt;/DELETE>
+            &lt;/SQL>
+    </Query.xml>
+
+    <Select>
+        <Head>
+            using System;
+            using System.Data;
+            using System.Data.SqlClient;
+            using {0}.Support.Model;
+            using {0}.Properties;
+            namespace {0}.Support.SQL
+            @
+                //生成时间:{1}
+                /// &lt;summary>
+                /// 数据查询类
+                /// &lt;/summary>
+                public class Select
+                @
+                    public Select() @ $
+                    #region 执行查询操作
+                    /// &lt;summary>
+                    /// 执行查询操作
+                    /// &lt;/summary>
+                    /// &lt;param name="commStr">指定的查询命令&lt;/param>
+                    /// &lt;returns>查询结果&lt;/returns>
+                    public DataTable Go(string commStr)
+                    @
+                        SqlConnection conn = new SqlConnection(Settings.Default.connectionStrings);
+                        try
+                        @
+                            conn.Open();
+                            SqlDataAdapter sda = new SqlDataAdapter(commStr, conn);
+                            DataTable table = new DataTable();
+                            sda.Fill(table);
+                            return table;
+                        $
+                        catch(Exception ex)
+                        @
+                            throw ex;
+                        $
+                        finally
+                        @
+                            if(conn.State == ConnectionState.Open)
+                                conn.Close();
+                        $
+                    $
+                    #endregion 执行查询操作
+
+                    #region 通用查询语句
+                    /// &lt;summary>
+                    /// 通用查询
+                    /// &lt;/summary>
+                    /// &lt;param name="column">要查询的列&lt;/param>
+                    /// &lt;param name="table">要查询的表&lt;/param>
+                    /// &lt;param name="filter">查询条件(如 x = y)&lt;/param>
+                    /// &lt;returns>查询结果&lt;/returns>
+                    public DataTable UniversalSelect(string column, string table, string filter)
+                    @
+                        string commStr = XmlReader.GetCommStr("SELECT", "UniversalSelect");
+                        commStr = string.Format(commStr, column, table, filter);
+                        return Go(commStr);
+                    $
+                    #endregion 通用查询语句
+                    {2}
+                $
+            $
+        </Head>
+        <SummaryParam>
+                    /// &lt;param name="{0}">{1}&lt;/param></SummaryParam>
+        <Body>
+                    #region 查询 {0}信息
+                    /// &lt;summary>
+                    /// 查询 {0}信息
+                    /// &lt;/summary>{1}
+                    /// &lt;returns>{0}信息结果&lt;/returns>
+                    public DataTable {2}(string {3} = null)
+                    @
+                        try
+                        @
+                            string commStr = XmlReader.GetCommStr("SELECT", "GetAll{2}");
+                            if(!string.IsNullOrEmpty({3}))
+                            @
+                                commStr = string.Format(XmlReader.GetCommStr("SELECT", "GetAll{2}ById"), {3});
+                            $
+                            return Go(commStr);
+                        $
+                        catch(Exception ex)
+                        @
+                            throw ex;
+                        $
+                    $
+                    #endregion 查询 {0}信息
+        </Body>
+        <SQL.xml>
+                    &lt;!--查询所有{0}-->
+                    &lt;GetAll{1}>{2}&lt;/GetAll{1}>
+                    &lt;!--根据主键查询{0}-->
+                    &lt;Get{1}ById>{3}&lt;/Get{1}ById>
+        </SQL.xml>
+    </Select>
+    <Update>
+        <Head>
+            using System;
+            using System.Collections.Generic;
+            using System.Configuration;
+            using System.Data;
+            using System.Data.SqlClient;
+            using System.Linq;
+            using System.Text;
+            using {0}.Properties;
+            using {0}.Support.Model;
+
+            namespace {0}.Support.SQL
+            @
+                //生成时间:{1}
+                /// &lt;summary>
+                /// 数据更新类
+                /// &lt;/summary>
+                public class Update
+                @
+                    public Update() @ $
+                    #region 执行更新操作
+                    /// &lt;summary>
+                    /// 执行更新操作
+                    /// &lt;/summary>
+                    /// &lt;param name="commStr">指定的更新命令&lt;/param>
+                    /// &lt;returns>是否执行成功&lt;/returns>
+                    public bool Go(string commStr)
+                    @
+                        SqlConnection conn = new SqlConnection(Settings.Default.connectionStrings);
+                        try
+                        @
+                            SqlCommand cmd = new SqlCommand(commStr, conn);
+                            conn.Open();
+                            return cmd.ExecuteNonQuery() > 0;
+                        $
+                        catch(Exception ex)
+                        @
+                            throw ex;
+                        $
+                        finally
+                        @
+                            if(conn.State == ConnectionState.Open)
+                                conn.Close();
+                        $
+                    $
+                    #endregion 执行更新操作
+                    {2}
+                $
+            $
+        </Head>
+        <SummaryParam>
+                    /// &lt;param name="{0}">{1}&lt;/param></SummaryParam>
+        <Body>
+                    #region 更新 {0}信息
+                    /// &lt;summary>
+                    /// 更新 {0}信息
+                    /// &lt;/summary>{1}
+                    /// &lt;returns>是否更新成功&lt;/returns>
+                    public bool {2}({3} _{3})
+                    @
+                        try
+                        @
+                            string commStr = XmlReader.GetCommStr("UPDATE", "{2}");
+                            commStr = String.Format(commStr, {4});
+                            return Go(commStr);
+                        $
+                        catch (Exception ex)
+                        @
+                            throw ex;
+                        $
+                    $
+                    #endregion 更新 {0}信息
+        </Body>
+        <SQL.xml>
+                    &lt;!--根据主键更新{0}-->
+                    &lt;{1}>
+                        UPDATE {2} 
+                        SET {3} 
+                        WHERE {4} = '@{5}$'
+                    &lt;/{1}>
+        </SQL.xml>
+    </Update>
+    <Insert>
+        <Head>
+            using System;
+            using System.Collections.Generic;
+            using System.Configuration;
+            using System.Data;
+            using System.Data.SqlClient;
+            using System.Linq;
+            using System.Text;
+            using {0}.Properties;
+            using {0}.Support.Model;
+
+            namespace {0}.Support.SQL
+            @
+                //生成时间:{1}
+                /// &lt;summary>
+                /// 数据库插入类
+                /// &lt;/summary>
+                public class Insert
+                @
+                    public Insert() @ $
+                    #region 执行插入操作
+                    /// &lt;summary>
+                    /// 执行插入操作
+                    /// &lt;/summary>
+                    /// &lt;param name="commStr">指定的插入命令&lt;/param>
+                    /// &lt;returns>是否执行成功&lt;/returns>
+                    public bool Go(string commStr)
+                    @
+                        SqlConnection conn = new SqlConnection(Settings.Default.connectionStrings);
+                        try
+                        @
+                            SqlCommand cmd = new SqlCommand(commStr, conn);
+                            conn.Open();
+                            return cmd.ExecuteNonQuery() > 0;
+                        $
+                        catch(Exception ex)
+                        @
+                            throw ex;
+                        $
+                        finally
+                        @
+                            if(conn.State == ConnectionState.Open)
+                                conn.Close();
+                        $
+                    $
+                    #endregion 执行插入操作
+                    {2}
+                $
+            $
+        </Head>
+        <SummaryParam>
+                    /// &lt;param name="{0}">{1}&lt;/param></SummaryParam>
+        <Body>
+                    #region 插入 {0}信息
+                    /// &lt;summary>
+                    /// 插入 {0}信息
+                    /// &lt;/summary>{1}
+                    /// &lt;returns>是否插入成功&lt;/returns>
+                    public bool {2}({3} _{3})
+                    @
+                        try
+                        @
+                            string commStr = XmlReader.GetCommStr("INSERT", "{2}");
+                            commStr = String.Format(commStr, {4});
+                            return Go(commStr);
+                        $
+                        catch (Exception ex)
+                        @
+                            throw ex;
+                        $
+                    $
+                    #endregion 插入 {0}信息
+        </Body>
+        <SQL.xml>
+                    &lt;!--插入{0}-->
+                    &lt;{1}>
+                        INSERT INTO {2}
+                            ({3})
+                        VALUES
+                            ({4})
+                    &lt;/{1}>
+        </SQL.xml>
+    </Insert>
+    <Delete>
+        <Head>
+            using System;
+            using System.Collections.Generic;
+            using System.Configuration;
+            using System.Data;
+            using System.Data.SqlClient;
+            using System.Linq;
+            using System.Text;
+            using {0}.Properties;
+            using {0}.Support.Model;
+
+            namespace {0}.Support.SQL
+            @
+                //生成时间:{1}
+                /// &lt;summary>
+                /// 数据库删除类
+                /// &lt;/summary>
+                public class Delete
+                @
+                    public Delete() @ $
+                    #region 执行删除操作
+                    /// &lt;summary>
+                    /// 执行删除操作
+                    /// &lt;/summary>
+                    /// &lt;param name="commStr">指定的删除命令&lt;/param>
+                    /// &lt;returns>是否执行成功&lt;/returns>
+                    public bool Go(string commStr)
+                    @
+                        SqlConnection conn = new SqlConnection(Settings.Default.connectionStrings);
+                        try
+                        @
+                            SqlCommand cmd = new SqlCommand(commStr, conn);
+                            conn.Open();
+                            return cmd.ExecuteNonQuery() > 0;
+                        $
+                        catch(Exception ex)
+                        @
+                            throw ex;
+                        $
+                        finally
+                        @
+                            if(conn.State == ConnectionState.Open)
+                                conn.Close();
+                        $
+                    $
+                    #endregion 执行删除操作
+                    
+                    #region 通用删除操作
+                    /// &lt;summary>
+                    /// 通用删除删除操作
+                    /// &lt;/summary>
+                    /// &lt;param name="table">要删除的表&lt;/param>
+                    /// &lt;param name="filter">查询条件(如 x = y)&lt;/param>
+                    /// &lt;returns>是否删除成功&lt;/returns>
+                    public bool UniversalDelete(string table, string filter)
+                    @
+                        try
+                        @
+                            string commStr = XmlReader.GetCommStr("DELETE", "UniversalDelete");
+                            commStr = String.Format(commStr, table, filter);
+                            return Go(commStr);
+                        $
+                        catch (Exception ex)
+                        @
+                            throw ex;
+                        $
+                    $
+                    #endregion
+                    {2}
+                $
+            $
+        </Head>
+        <SummaryParam>
+                    /// &lt;param name="{0}">{1}&lt;/param></SummaryParam>
+        <Body>
+            
+        </Body>
+        <SQL.xml>
+                    &lt;!--根据主键删除{0}-->
+                    &lt;{1}>DELETE FROM {2} WHERE {3} = '@0$'&lt;/{1}>
+        </SQL.xml>
+    </Delete>
+    <XmlReader>
+        <Head>
+            using System;
+            using System.Reflection;
+            using System.Xml;
+            using {0}.Support.Model;
+
+            namespace {0}.Support
+            @
+                //生成时间:{1}
+                /// &lt;summary>
+                /// 读取 XML 类
+                ///&lt;/summary>
+                public class XmlReader
+                @
+                    /// &lt;summary>
+                    /// 从 XML 文件获取 SQL 命令
+                    /// &lt;/summary>
+                    /// &lt;param name="type">命令类型(如 SELECT/UPDATE/INSERT/DELETE 等)&lt;/param>
+                    /// &lt;param name="node">命令名称&lt;/param>
+                    /// &lt;param name="xmlFilePath">作为来源的 xml 文件路径,为空则表示从 Model 中获取&lt;/param>
+                    /// &lt;returns>&lt;/returns>
+                    public static string GetCommStr(string type, string node, string xmlFilePath = null)
+                    @
+                        try
+                        @
+                            if (!string.IsNullOrEmpty(xmlFilePath))
+                            @//从给定的 xml 文件获取 SQL 命令
+                                XmlDocument doc = new XmlDocument();
+                                doc.Load(xmlFilePath);
+                                return doc.SelectSingleNode("SQL").SelectSingleNode(type).SelectSingleNode(node).InnerText;
+                            $
+                            else
+                            @//从 Model 获取 SQL 命令
+                                return GetCommStr1(type, node);
+                            $
+                        $
+                        catch (Exception ex)
+                        @
+                            throw ex;
+                        $
+                    $
+    
+                    /// &lt;summary>
+                    /// 从 Model 获取 SQL 命令
+                    /// &lt;/summary>
+                    /// &lt;param name="type">命令类型(如 SELECT/UPDATE/INSERT/DELETE 等)&lt;/param>
+                    /// &lt;param name="node">命令名称&lt;/param>
+                    /// &lt;returns>&lt;/returns>
+                    public static string GetCommStr1(string type, string node)
+                    @//通过 反射 获取属性值
+                        switch (type.ToUpper())
+                        @
+                            {2}
+                            default:
+                            @
+                                return "";
+                            $
+                        $
+                    $
+                $
+            $
+        </Head>
+        <Case>
+                            case "{0}":
+                            @
+                                {0} {1} = new {0}();
+                                Type t = {1}.GetType();//获取类型
+                                PropertyInfo pInfo = t.GetProperty(node);//获取指定名称的属性
+                                return (string)pInfo.GetValue({1}, null);//返回属性值
+                            $
+        </Case>
+        <Types>SELECT,UPDATE,INSERT,DELETE</Types>
+    </XmlReader>
+    <QueryModel>
+        <Head>
+            using System;
+
+            namespace yyyyy.Support.Model
+            @
+                {0}
+            $
+        </Head>
+        <Body>
+                //生成时间:{0}
+                /// &lt;summary>
+                /// 数据库 {1} 实体类
+                /// &lt;/summary>
+                [Serializable]
+                public class {1}
+                @
+                    public {1}() @$
+                    #region {1} Model
+                    {2}
+                    #endregion {1} Model
+                $
+        </Body>
+        <Declare>
+                    /*↓↓↓{0}↓↓↓*/
+                    private static string _{1} = [at]"{2}";
+
+                    /// &lt;summary>
+                    /// {0} {1}
+                    /// &lt;/summary>
+                    public static string {1}
+                    @
+                        get @ return _{1}; $
+                    $
+        </Declare>
+    </QueryModel>
+</Template>

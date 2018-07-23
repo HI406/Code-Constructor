@@ -1,0 +1,141 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!--数据库 SQL 命令集-->
+<SQL>
+  <!--查询操作命令-->
+  <SELECT>
+    <!--通用查询语句-->
+    <UniversalSelect>SELECT {0} FROM {1} WHERE {2}</UniversalSelect>
+    <!--获取所有的数据库-->
+    <GetAllDataBase>SELECT * FROM Master..SysDatabases ORDER BY name</GetAllDataBase>
+      <!--获取指定数据库的所有表-->
+      <GetAllTableAndView>SELECT * FROM sysobjects WHERE xtype IN ('U','V') ORDER BY xtype, name</GetAllTableAndView>
+      <!--获取指定数据库的所有用户表-->
+      <GetAllTable>SELECT * FROM sysobjects WHERE xtype='U' ORDER BY name</GetAllTable>
+      <!--获取指定数据库的所有视图-->
+      <GetAllView>SELECT * FROM sysobjects WHERE xtype='V' ORDER BY name</GetAllView>
+    <!--获取字段详情-->
+    <GetAllColumn>
+      SELECT [tableName] = d.name
+      ,[tableDescription] = Isnull(f.VALUE,'')
+      ,[index] = a.colorder
+      ,[name] = a.name
+      ,[isIdentity] = CASE
+      WHEN Columnproperty(a.id,a.name,'IsIdentity') = 1 THEN '1'
+      ELSE '0'
+      END
+      ,[isPrimaryKey] = CASE
+      WHEN EXISTS (SELECT 1
+      FROM   sysobjects
+      WHERE  xtype = 'PK'
+      AND name IN (SELECT name
+      FROM   sysindexes
+      WHERE  indid IN (SELECT indid
+      FROM   sysindexkeys
+      WHERE  id = a.id
+      AND colid = a.colid))) THEN '1'
+      ELSE '0'
+      END
+      ,[sqlType] = b.name
+      ,[length] = a.length
+      ,[precision] = Columnproperty(a.id,a.name,'PRECISION')
+      ,[scale] = Isnull(Columnproperty(a.id,a.name,'Scale'),0)
+      ,[allowNull] = CASE
+      WHEN a.isnullable = 1 THEN '1'
+      ELSE '0'
+      END
+      ,[defaultValue] = Isnull(e.TEXT,'')
+      ,[description] = Isnull(g.[value],'')
+      FROM     syscolumns a
+      LEFT JOIN systypes b
+      ON a.xusertype = b.xusertype
+      INNER JOIN sysobjects d
+      ON (a.id = d.id)
+      AND (d.xtype = 'U')
+      AND (d.name != 'dtproperties')
+      INNER JOIN  sys.all_objects c
+      ON d.id=c.object_id
+      AND  schema_name(schema_id)='dbo'
+      LEFT JOIN syscomments e
+      ON a.cdefault = e.id
+      LEFT JOIN sys.extended_properties g
+      ON (a.id = g.major_id)
+      AND (a.colid = g.minor_id)
+      LEFT JOIN sys.extended_properties f
+      ON (d.id = f.major_id)
+      AND (f.minor_id = 0)
+      {0}
+      ORDER BY a.id
+      ,a.colorder
+    </GetAllColumn>
+      <!--获取视图字段详情-->
+      <GetAllViewColumn>
+          SELECT distinct
+          a.id
+          ,a.colorder
+          ,[tableName] = d.name
+          ,[tableDescription]=null
+          ,[index] = a.colorder
+          ,[name] = a.name
+          ,[isIdentity] = CASE
+          WHEN Columnproperty(a.id,a.name,'IsIdentity') = 1 THEN '1'
+          ELSE '0'
+          END
+          ,[isPrimaryKey] = CASE
+          WHEN EXISTS (SELECT 1
+          FROM   sysobjects
+          WHERE  xtype = 'PK'
+          AND name IN (SELECT name
+          FROM   sysindexes
+          WHERE  indid IN (SELECT indid
+          FROM   sysindexkeys
+          WHERE  id = a.id
+          AND colid = a.colid))) THEN '1'
+          ELSE '0'
+          END
+          ,[sqlType] = b.name
+          ,[length] = a.length
+          ,[precision] = Columnproperty(a.id,a.name,'PRECISION')
+          ,[scale] = Isnull(Columnproperty(a.id,a.name,'Scale'),0)
+          ,[allowNull] = CASE
+          WHEN a.isnullable = 1 THEN '1'
+          ELSE '0'
+          END
+          ,[defaultValue] = Isnull(e.TEXT,'')
+          ,[description] = Isnull(g.[value],'')
+          FROM     syscolumns a
+          LEFT JOIN systypes b
+          ON a.xusertype = b.xusertype
+          INNER JOIN sysobjects d
+          ON (a.id = d.id)
+          AND (d.xtype = 'V')
+          AND (d.name != 'dtproperties')
+          INNER JOIN  sys.all_objects c
+          ON d.id=c.object_id
+          AND  schema_name(schema_id)='dbo'
+          LEFT JOIN syscomments e
+          ON a.cdefault = e.id
+          LEFT JOIN sys.extended_properties g
+          ON (a.id = g.major_id)
+          AND (a.colid = g.minor_id)
+          LEFT JOIN sys.extended_properties f
+          ON (d.id = f.major_id)
+          AND (f.minor_id = 0)
+          {0}
+          ORDER BY a.id
+          ,a.colorder
+      </GetAllViewColumn>
+  </SELECT>
+  <!--更新操作语句-->
+  <UPDATE>
+
+  </UPDATE>
+  <!--插入操作语句-->
+  <INSERT>
+
+  </INSERT>
+  <!--删除操作语句-->
+  <!--逻辑删除(更新isDeleted状态)-->
+  <DELETE>
+
+  </DELETE>
+</SQL>

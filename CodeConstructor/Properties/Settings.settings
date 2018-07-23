@@ -1,0 +1,33 @@
+﻿<?xml version='1.0' encoding='utf-8'?>
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="CodeConstructor.Properties" GeneratedClassName="Settings">
+  <Profiles />
+  <Settings>
+    <Setting Name="DataSource" Type="System.String" Scope="User">
+      <Value Profile="(Default)">.,</Value>
+    </Setting>
+    <Setting Name="InitialCatalog" Type="System.String" Scope="User">
+      <Value Profile="(Default)">JandanPic,</Value>
+    </Setting>
+    <Setting Name="UserID" Type="System.String" Scope="User">
+      <Value Profile="(Default)">sa,</Value>
+    </Setting>
+    <Setting Name="Password" Type="System.String" Scope="User">
+      <Value Profile="(Default)">1392033131,</Value>
+    </Setting>
+    <Setting Name="connectionStrings" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Data Source=知らない\HI406;Initial Catalog=master;User ID=sa;Password=1392033131;Connect Timeout=30</Value>
+    </Setting>
+    <Setting Name="IsTest" Type="System.Boolean" Scope="Application">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="Namespace" Type="System.String" Scope="User">
+      <Value Profile="(Default)">CodeConstructor</Value>
+    </Setting>
+    <Setting Name="CreateFilePath" Type="System.String" Scope="User">
+      <Value Profile="(Default)">E:\Desktop\CodeConstructor</Value>
+    </Setting>
+    <Setting Name="keywordsCSharp" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">abstract,as,base,bool,break,byte,case,catch,char,checked,const,continue,default,do,double,else,enum,explicit,extern,false,finally,fixed,float,for,foreach,goto,if,implicit,in,int,is,lock,long,namespace,new,null,operator,out,params,ref,return,sbyte,sealed,short,sizeof,stackalloc,static,struct,switch,this,throw,true,try,typeof,uint,ulong,unchecked,unsafe,ushort,using,using static,virtual,void,volatile,while,add,alias,ascending,async,await,descending,from,get,global,group,into,join,let,nameof,orderby,partial,remove,select,set,var,when,where,yield</Value>
+    </Setting>
+  </Settings>
+</SettingsFile>
